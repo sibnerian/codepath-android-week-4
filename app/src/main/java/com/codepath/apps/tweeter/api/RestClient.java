@@ -61,4 +61,31 @@ public class RestClient extends OAuthBaseClient {
 		params.put("status", body);
 		getClient().post(apiUrl, params, handler);
 	}
+
+    public void getUserTimeline(String screenName, long maxId, AsyncHttpResponseHandler handler) {
+        String apiUrl = getApiUrl("statuses/user_timeline.json");
+        RequestParams params = new RequestParams();
+        params.put("count", String.valueOf(TWEETS_PER_PAGE));
+        if (screenName != null) {
+            params.put("screen_name", screenName);
+        }
+        if (maxId > 0) {
+            params.put("max_id", String.valueOf(maxId));
+        }
+        getClient().get(apiUrl, params, handler);
+    }
+
+
+    public void getUserInfo(String screenName, AsyncHttpResponseHandler handler) {
+        String apiUrl;
+        RequestParams params = null;
+        if (screenName ==  null) {
+            apiUrl = getApiUrl("account/verify_credentials.json");
+        } else {
+            apiUrl = getApiUrl("users/show.json");
+            params = new RequestParams();
+            params.put("screen_name", screenName);
+        }
+        getClient().get(apiUrl, params, handler);
+    }
 }

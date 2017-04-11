@@ -6,7 +6,7 @@
 >
     <ImageView
         android:id="@+id/profilePicture"
-        android:scaleType="centerInside"
+        android:scaleType="fitXY"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_marginRight="16dp"

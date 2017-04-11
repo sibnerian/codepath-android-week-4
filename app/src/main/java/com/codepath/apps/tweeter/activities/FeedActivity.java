@@ -1,6 +1,7 @@
 package com.codepath.apps.tweeter.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -58,6 +59,10 @@ public class FeedActivity extends AppCompatActivity {
         frag.show(fm, "fragment_compose_tweet");
     }
 
+    public void onProfileView(MenuItem mi) {
+        Intent i = new Intent(this, ProfileActivity.class);
+        startActivity(i);
+    }
 
     public class TweetsPagerAdapter extends FragmentPagerAdapter {
         private String tabTitles[] = new String[] { "Home", "Mentions" };

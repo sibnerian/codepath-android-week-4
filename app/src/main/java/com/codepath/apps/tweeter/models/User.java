@@ -1,5 +1,7 @@
 package com.codepath.apps.tweeter.models;
 
+import android.support.annotation.Nullable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -23,6 +25,19 @@ public class User {
     @SerializedName("id")
     @Expose
     public long id;
+
+    @SerializedName("description")
+    @Expose
+    @Nullable
+    public String tagline;
+
+    @SerializedName("followers_count")
+    @Expose
+    public int followersCount;
+
+    @SerializedName("friends_count")
+    @Expose
+    public int followingCount;
 
     public String getFullScreenName() {
         return "@" + screenName;

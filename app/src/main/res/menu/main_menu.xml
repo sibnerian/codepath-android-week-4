@@ -7,4 +7,12 @@
         app:showAsAction="ifRoom"
         android:title="Compose tweet">
     </item>
+    <item
+        android:id="@+id/miProfile"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_user_profile"
+        android:title="Profile"
+        android:onClick="onProfileView"
+    ></item>
+
 </menu>
