@@ -34,7 +34,7 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         // passed in from launching activity
-        String screenName = getIntent().getStringExtra("screenNameView");
+        String screenName = getIntent().getStringExtra("screenName");
         UserTimelineFragment userTimelineFragment = UserTimelineFragment.newInstance(screenName);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);

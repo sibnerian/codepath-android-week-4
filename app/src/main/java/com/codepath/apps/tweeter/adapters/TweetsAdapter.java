@@ -1,6 +1,7 @@
 package com.codepath.apps.tweeter.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.tweeter.R;
+import com.codepath.apps.tweeter.activities.ProfileActivity;
 import com.codepath.apps.tweeter.models.Tweet;
 
 import java.util.List;
@@ -59,6 +61,18 @@ public class TweetsAdapter  extends RecyclerView.Adapter<TweetsAdapter.ViewHolde
                 .into(viewHolder.profilePicture);
         viewHolder.screenName.setText(tweet.user.getFullScreenName());
         viewHolder.tweetText.setText(tweet.text);
+        viewHolder.profilePicture.setOnClickListener(getClickListenerForTweet(tweet));
+    }
+
+    private View.OnClickListener getClickListenerForTweet(final Tweet tweet) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), ProfileActivity.class);
+                intent.putExtra("screenName", tweet.user.screenName);
+                getContext().startActivity(intent);
+            }
+        };
     }
 
     @Override
