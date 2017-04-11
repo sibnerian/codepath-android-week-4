@@ -1,48 +1,40 @@
 package com.codepath.apps.tweeter.activities;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.codepath.apps.tweeter.R;
-import com.codepath.apps.tweeter.TweeterApplication;
-import com.codepath.apps.tweeter.adapters.TweetsAdapter;
 import com.codepath.apps.tweeter.fragments.ComposeTweetDialogFragment;
+import com.codepath.apps.tweeter.fragments.MentionsFragment;
+import com.codepath.apps.tweeter.fragments.TimelineFragment;
 import com.codepath.apps.tweeter.models.Tweet;
-import com.codepath.apps.tweeter.utils.EndlessRecyclerViewScrollListener;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.loopj.android.http.TextHttpResponseHandler;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import cz.msebera.android.httpclient.Header;
 
 public class FeedActivity extends AppCompatActivity {
     Toolbar toolbar;
-    ArrayList<Tweet> tweets = new ArrayList<>();
-    TweetsAdapter tweetsAdapter;
-    RecyclerView recyclerView;
-    ImageView loadingIndicator;
-    EndlessRecyclerViewScrollListener scrollListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
-        setupViews();
-        populateTimeline();
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        setupTabs();
+    }
+
+    private void setupTabs() {
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setAdapter(new TweetsPagerAdapter(getSupportFragmentManager(), FeedActivity.this));
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     @Override
@@ -58,92 +50,43 @@ public class FeedActivity extends AppCompatActivity {
             @Override
             public void onPostTweet(Tweet tweet) {
                 frag.dismiss();
-                tweets.add(0, tweet);
-                tweetsAdapter.notifyItemInserted(0);
+                // TODO
+//                tweets.add(0, tweet);
+//                tweetsAdapter.notifyItemInserted(0);
             }
         });
         frag.show(fm, "fragment_compose_tweet");
     }
 
-    private void setupViews() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        tweetsAdapter = new TweetsAdapter(this, tweets);
-        loadingIndicator = (ImageView) findViewById(R.id.loadingIndicator);
 
-        setupRecyclerView();
+    public class TweetsPagerAdapter extends FragmentPagerAdapter {
+        private String tabTitles[] = new String[] { "Home", "Mentions" };
+        private Context context;
 
-    }
-
-    private void setupRecyclerView() {
-        recyclerView = (RecyclerView) findViewById(R.id.rvTweets);
-        recyclerView.setAdapter(tweetsAdapter);
-        LinearLayoutManager layoutManager =
-                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        recyclerView.setLayoutManager(layoutManager);
-        RecyclerView.ItemDecoration itemDecoration = new
-                DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
-        recyclerView.addItemDecoration(itemDecoration);
-//        ItemClickSupport.addTo(recyclerView).setOnItemClickListener(
-//                new ItemClickSupport.OnItemClickListener() {
-//                    @Override
-//                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-//                        launchArticleWebView(position);
-//                    }
-//                }
-//        );
-        scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                getNextTweets();
-            }
-        };
-        recyclerView.addOnScrollListener(scrollListener);
-
-    }
-
-    private void getNextTweets() {
-        showLoadingIndicator();
-        long lastId = tweets.isEmpty() ? -1 : tweets.get(tweets.size() - 1).id;
-        TweeterApplication.getRestClient().getHomeTimeline(lastId, new TextHttpResponseHandler() {
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString,
-                                  Throwable throwable) {
-                throwable.printStackTrace();
-                // TODO: toast or snack bar
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                Gson gson = new GsonBuilder().create();
-                Tweet[] tweetsArr = gson.fromJson(responseString, Tweet[].class);
-                int curSize = tweetsAdapter.getItemCount();
-                tweets.addAll(Arrays.asList(tweetsArr));
-                tweetsAdapter.notifyItemRangeInserted(curSize, tweetsArr.length);
-                hideLoadingIndicator();
-            }
-        });
-    }
-
-    private void populateTimeline() {
-        if (!tweets.isEmpty()) {
-            clearTimeline();
+        public TweetsPagerAdapter(FragmentManager fm, Context context) {
+            super(fm);
+            this.context = context;
         }
-        getNextTweets();
-    }
 
-    private void clearTimeline() {
-        tweets.clear();
-        tweetsAdapter.notifyDataSetChanged();
-        scrollListener.resetState();
-    }
+        @Override
+        public int getCount() {
+            return tabTitles.length;
+        }
 
-    private void showLoadingIndicator() {
-        loadingIndicator.setVisibility(View.VISIBLE);
-        Glide.with(this)
-                .load(R.raw.loading_dots)
-                .into(new GlideDrawableImageViewTarget(loadingIndicator));
+        @Override
+        public Fragment getItem(int position) {
+            if (position == 0) {
+                return new TimelineFragment();
+            } else if (position == 1) {
+                return new MentionsFragment();
+            }
+            return null;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            // Generate title based on item position
+            return tabTitles[position];
+        }
     }
-    private void hideLoadingIndicator() { loadingIndicator.setVisibility(View.GONE); }
 }
