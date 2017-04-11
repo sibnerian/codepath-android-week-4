@@ -21,6 +21,7 @@ import com.codepath.apps.tweeter.models.Tweet;
 
 public class FeedActivity extends AppCompatActivity {
     Toolbar toolbar;
+    private TweetsPagerAdapter tweetsPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +34,8 @@ public class FeedActivity extends AppCompatActivity {
 
     private void setupTabs() {
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        viewPager.setAdapter(new TweetsPagerAdapter(getSupportFragmentManager(), FeedActivity.this));
+        tweetsPagerAdapter = new TweetsPagerAdapter(getSupportFragmentManager(), FeedActivity.this);
+        viewPager.setAdapter(tweetsPagerAdapter);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
     }
@@ -51,9 +53,7 @@ public class FeedActivity extends AppCompatActivity {
             @Override
             public void onPostTweet(Tweet tweet) {
                 frag.dismiss();
-                // TODO
-//                tweets.add(0, tweet);
-//                tweetsAdapter.notifyItemInserted(0);
+                tweetsPagerAdapter.manuallyInsertTweet(tweet);
             }
         });
         frag.show(fm, "fragment_compose_tweet");
@@ -66,11 +66,10 @@ public class FeedActivity extends AppCompatActivity {
 
     public class TweetsPagerAdapter extends FragmentPagerAdapter {
         private String tabTitles[] = new String[] { "Home", "Mentions" };
-        private Context context;
+        private TimelineFragment tf;
 
         public TweetsPagerAdapter(FragmentManager fm, Context context) {
             super(fm);
-            this.context = context;
         }
 
         @Override
@@ -81,7 +80,8 @@ public class FeedActivity extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
             if (position == 0) {
-                return new TimelineFragment();
+                tf = new TimelineFragment();
+                return tf;
             } else if (position == 1) {
                 return new MentionsFragment();
             }
@@ -92,6 +92,10 @@ public class FeedActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             // Generate title based on item position
             return tabTitles[position];
+        }
+
+        public void manuallyInsertTweet(Tweet tweet) {
+            tf.manuallyInsertTweet(tweet);
         }
     }
 }

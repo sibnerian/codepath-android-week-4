@@ -10,10 +10,6 @@ import java.util.Arrays;
 
 import cz.msebera.android.httpclient.Header;
 
-/**
- * Created by ian_sibner on 4/10/17.
- */
-
 public class TimelineFragment extends TweetsListFragment {
     @Override
     void getNextTweets() {
@@ -38,5 +34,10 @@ public class TimelineFragment extends TweetsListFragment {
                 hideLoadingIndicator();
             }
         });
+    }
+
+    public void manuallyInsertTweet(Tweet tweet) {
+        tweets.add(0, tweet);
+        tweetsAdapter.notifyDataSetChanged();
     }
 }
